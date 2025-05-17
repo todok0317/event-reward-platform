@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # API Gateway 서비스
   api-gateway:
     build:
       context: .
@@ -19,6 +20,7 @@ services:
     networks:
       - app-network
 
+  # Auth Server 서비스
   auth-server:
     build:
       context: .
@@ -34,6 +36,7 @@ services:
     networks:
       - app-network
 
+  # Event Server 서비스
   event-server:
     build:
       context: .
@@ -48,6 +51,7 @@ services:
     networks:
       - app-network
 
+  # MongoDB 서비스
   mongodb:
     image: mongo:latest
     ports:
@@ -57,9 +61,11 @@ services:
     networks:
       - app-network
 
+# 네트워크 설정
 networks:
   app-network:
     driver: bridge
 
+# 볼륨 설정
 volumes:
   mongodb_data:

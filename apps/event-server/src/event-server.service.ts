@@ -15,42 +15,68 @@ export class EventServerService {
     @InjectModel(RewardRequest.name) private rewardRequestModel: Model<RewardRequestDocument>,
   ) {}
 
-  // Event methods
+  // 이벤트 관련 메서드
+  /**
+   * 이벤트 생성
+   * @param createEventDto 이벤트 생성 DTO
+   * @returns 생성된 이벤트 정보
+   */
   async createEvent(createEventDto: CreateEventDto): Promise<Event> {
     const newEvent = new this.eventModel(createEventDto);
     return newEvent.save();
   }
 
+  /**
+   * 모든 이벤트 조회
+   * @returns 이벤트 목록
+   */
   async findAllEvents(): Promise<Event[]> {
     return this.eventModel.find().exec();
   }
 
+  /**
+   * ID로 이벤트 조회
+   * @param id 이벤트 ID
+   * @returns 이벤트 정보
+   */
   async findEventById(id: string): Promise<Event> {
     const event = await this.eventModel.findById(id).exec();
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException('이벤트를 찾을 수 없습니다');
     }
     return event;
   }
 
+  /**
+   * 이벤트 업데이트
+   * @param id 이벤트 ID
+   * @param updateEventDto 이벤트 업데이트 DTO
+   * @returns 업데이트된 이벤트 정보
+   */
   async updateEvent(id: string, updateEventDto: UpdateEventDto): Promise<Event> {
     const updatedEvent = await this.eventModel
       .findByIdAndUpdate(id, updateEventDto, { new: true })
       .exec();
     
     if (!updatedEvent) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException('이벤트를 찾을 수 없습니다');
     }
     
     return updatedEvent;
   }
 
-  // Reward methods
+  // 보상 관련 메서드
+  /**
+   * 보상 생성
+   * @param eventId 이벤트 ID
+   * @param createRewardDto 보상 생성 DTO
+   * @returns 생성된 보상 정보
+   */
   async createReward(eventId: string, createRewardDto: CreateRewardDto): Promise<Reward> {
-    // Check if event exists
+    // 이벤트 존재 여부 확인
     const event = await this.eventModel.findById(eventId).exec();
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException('이벤트를 찾을 수 없습니다');
     }
     
     const newReward = new this.rewardModel({
@@ -61,41 +87,52 @@ export class EventServerService {
     return newReward.save();
   }
 
+  /**
+   * 이벤트별 보상 목록 조회
+   * @param eventId 이벤트 ID
+   * @returns 보상 목록
+   */
   async findRewardsByEventId(eventId: string): Promise<Reward[]> {
     return this.rewardModel.find({ eventId }).exec();
   }
 
-  // Reward request methods
+  // 보상 요청 관련 메서드
+  /**
+   * 보상 요청
+   * @param eventId 이벤트 ID
+   * @param rewardRequestDto 보상 요청 DTO
+   * @returns 생성된 보상 요청 정보
+   */
   async requestReward(eventId: string, rewardRequestDto: RewardRequestDto): Promise<RewardRequest> {
     const { userId } = rewardRequestDto;
     
-    // Check if event exists
+    // 이벤트 존재 여부 확인
     const event = await this.eventModel.findById(eventId).exec();
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException('이벤트를 찾을 수 없습니다');
     }
     
-    // Check if event is active
+    // 이벤트 활성화 여부 확인
     if (!event.isActive) {
-      throw new BadRequestException('Event is not active');
+      throw new BadRequestException('이벤트가 활성화되지 않았습니다');
     }
     
-    // Check if event period is valid
+    // 이벤트 기간 유효성 확인
     const currentDate = new Date();
     if (currentDate < event.startDate || currentDate > event.endDate) {
-      throw new BadRequestException('Event is not in progress');
+      throw new BadRequestException('이벤트 기간이 아닙니다');
     }
     
-    // Check if user already requested reward for this event
+    // 중복 보상 요청 체크
     const existingRequest = await this.rewardRequestModel
       .findOne({ userId, eventId })
       .exec();
       
     if (existingRequest) {
-      throw new ConflictException('Reward already requested for this event');
+      throw new ConflictException('이미 이 이벤트에 대한 보상을 요청했습니다');
     }
     
-    // Create new reward request
+    // 새 보상 요청 생성
     const newRequest = new this.rewardRequestModel({
       userId,
       eventId,
@@ -105,6 +142,11 @@ export class EventServerService {
     return newRequest.save();
   }
 
+  /**
+   * 사용자별 보상 요청 목록 조회
+   * @param userId 사용자 ID
+   * @returns 보상 요청 목록
+   */
   async findRequestsByUserId(userId: string): Promise<RewardRequest[]> {
     return this.rewardRequestModel
       .find({ userId })
@@ -112,6 +154,11 @@ export class EventServerService {
       .exec();
   }
 
+  /**
+   * 모든 보상 요청 목록 조회 (필터링 가능)
+   * @param query 쿼리 파라미터 (상태별, 이벤트별 필터링)
+   * @returns 보상 요청 목록
+   */
   async findAllRequests(query?: any): Promise<RewardRequest[]> {
     let filter = {};
     
@@ -129,7 +176,13 @@ export class EventServerService {
       .exec();
   }
 
-  // For admin to manually approve/reject reward requests
+  /**
+   * 보상 요청 상태 업데이트 (관리자용)
+   * @param requestId 보상 요청 ID
+   * @param status 새 상태 (PENDING, APPROVED, REJECTED)
+   * @param reason 사유 (선택적)
+   * @returns 업데이트된 보상 요청 정보
+   */
   async updateRequestStatus(
     requestId: string,
     status: RequestStatus,
@@ -137,7 +190,7 @@ export class EventServerService {
   ): Promise<RewardRequest> {
     const request = await this.rewardRequestModel.findById(requestId).exec();
     if (!request) {
-      throw new NotFoundException('Reward request not found');
+      throw new NotFoundException('보상 요청을 찾을 수 없습니다');
     }
     
     request.status = status;
