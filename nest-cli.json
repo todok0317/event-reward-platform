@@ -1,0 +1,56 @@
+{
+  "monorepo": true,
+  "root": "apps/event-reward-platform",
+  "sourceRoot": "apps/event-reward-platform/src",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/event-reward-platform/tsconfig.app.json"
+  },
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "auth-server": {
+      "type": "application",
+      "root": "apps/auth-server",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth-server/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth-server/tsconfig.app.json"
+      }
+    },
+    "common": {
+      "type": "library",
+      "root": "libs/common",
+      "entryFile": "index",
+      "sourceRoot": "libs/common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "event-reward-platform": {
+      "type": "application",
+      "root": "apps/event-reward-platform",
+      "entryFile": "main",
+      "sourceRoot": "apps/event-reward-platform/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/event-reward-platform/tsconfig.app.json"
+      }
+    },
+    "event-server": {
+      "type": "application",
+      "root": "apps/event-server",
+      "entryFile": "main",
+      "sourceRoot": "apps/event-server/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/event-server/tsconfig.app.json"
+      }
+    }
+  }
+}

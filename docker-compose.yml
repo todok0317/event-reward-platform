@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./apps/api-gateway/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - AUTH_SERVICE_HOST=auth-server
+      - AUTH_SERVICE_PORT=3001
+      - EVENT_SERVICE_HOST=event-server
+      - EVENT_SERVICE_PORT=3002
+    depends_on:
+      - auth-server
+      - event-server
+    networks:
+      - app-network
+
+  auth-server:
+    build:
+      context: .
+      dockerfile: ./apps/auth-server/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/auth
+      - JWT_SECRET=your_jwt_secret_key_here
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  event-server:
+    build:
+      context: .
+      dockerfile: ./apps/event-server/Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/event
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
