@@ -84,6 +84,9 @@ npm run docker:up
 npm run docker:down
 ```
 
+## ERD 문서
+![event-reward-platform.png](../../../../Downloads/event-reward-platform.png)
+
 ## API 문서
 
 ### Auth Server API
