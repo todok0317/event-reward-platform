@@ -7,6 +7,9 @@ import { Reward, RewardSchema } from './models/reward.schema';
 import { RewardRequest, RewardRequestSchema } from './models/reward-request.schema';
 import { ConfigModule } from '@nestjs/config';
 import { HealthController } from './health/health.controller';
+import { EventBusModule } from '@app/common/events/event-bus.module';
+import { RewardController } from './reward/reward.controller';
+import { RewardProcessorService } from './reward/reward-processor.service';
 
 /**
  * Event Server 모듈
@@ -26,8 +29,10 @@ import { HealthController } from './health/health.controller';
       { name: Reward.name, schema: RewardSchema },
       { name: RewardRequest.name, schema: RewardRequestSchema },
     ]),
+    // 이벤트 버스 모듈 등록
+    EventBusModule,
   ],
-  controllers: [EventServerController, HealthController],
-  providers: [EventServerService],
+  controllers: [EventServerController, HealthController, RewardController],
+  providers: [EventServerService, RewardProcessorService],
 })
 export class EventServerModule {}

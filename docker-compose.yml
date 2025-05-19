@@ -46,8 +46,10 @@ services:
     environment:
       - NODE_ENV=development
       - MONGODB_URI=mongodb://mongodb:27017/event
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - mongodb
+      - redis
     networks:
       - app-network
 
@@ -60,6 +62,16 @@ services:
       - mongodb_data:/data/db
     networks:
       - app-network
+      
+  # Redis 서비스 (이벤트 버스용)
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
 
 # 네트워크 설정
 networks:
@@ -69,3 +81,4 @@ networks:
 # 볼륨 설정
 volumes:
   mongodb_data:
+  redis_data:
