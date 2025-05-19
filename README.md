@@ -85,7 +85,7 @@ npm run docker:down
 ```
 
 ## ERD 문서
-![event-reward-platform.png](../../../../Downloads/event-reward-platform.png)
+![event-reward-platform](https://github.com/user-attachments/assets/51609d93-6813-41de-aa7a-a1a51e40e1c2)
 
 ## API 문서
 
