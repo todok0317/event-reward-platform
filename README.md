@@ -28,6 +28,9 @@
 - **TypeScript**: 최신 버전
 - **Docker & Docker Compose**: 컨테이너화 및 배포
 
+## 블로그 정리
+https://velog.io/@todok0317/NestJs-개념
+
 ## 설치 및 실행 방법
 
 ### 사전 준비사항
